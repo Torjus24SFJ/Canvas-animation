@@ -26,7 +26,41 @@ function App() {
   // }, []);
 
   useEffect(() => {
-    
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+
+    let x = canvas.width / 2;
+    let y = canvas.height / 2;
+    let speedX = 3;
+    let speecY = 2;
+
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = 'red';
+      ctx.beginPath();
+      ctx.arc(x, y, 50, 0, Math.PI * 2)
+      ctx.fill();
+
+      if (x + 50 > canvas.width || x - 50 < 0) speedX = -speedX;
+      if (y + 50 > canvas.height || y - 50 < 0) speecY = -speecY;
+
+      x += speedX;
+      y += speecY;
+
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    const handleResize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    }
   })
 
   return (
