@@ -82,25 +82,22 @@ function App() {
     let speedY = 2;
 
     let hue = 0;
-
     let cornerHits = 0;
-    let highScore = 0;
+    let hasSavedThisRun = false;
+    
     let leaderboard = [];
-
     const saved = localStorage.getItem("leaderboard");
     if (saved) {
       leaderboard = JSON.parse(saved);
-      highScore = leaderboard[0]?.score || 0;
     }
+    let highScore = leaderboard[0]?.score || 0;
 
     const saveToLeaderboard = () => {
+      if(hasSavedThisRun) return;
+      
       const entry = {
         score: cornerHits,
         date: new Date().toLocaleDateString(),
-        time: new Date().toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
       };
 
       leaderboard = [...leaderboard, entry]
@@ -109,6 +106,7 @@ function App() {
 
       localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
       highScore = leaderboard[0].score;
+      hasSavedThisRun = true;
     };
 
     const animate = () => {
@@ -149,9 +147,10 @@ function App() {
       } else {
         hue += 1;
       }
-
-      if (cornerHits > highScore) {
+      
+      if (cornerHits > highScore && !hasSavedThisRun) {
         saveToLeaderboard();
+        hasSavedThisRun = true;
       }
 
       ctx.font = "bold 32px Arial";
@@ -162,12 +161,12 @@ function App() {
 
       ctx.font = "bold 32px Arial";
       ctx.fillStyle = "gray";
-      ctx.fillText("Top 10:", 30, 90);
+      ctx.fillText("Highscore", 30, 90);
 
       ctx.font = "32px Arial";
       leaderboard.slice(0, 10).forEach((entry, i) => {
         ctx.fillText(
-          `${i + 1}. ${entry.score} — ${entry.date} ${entry.time}`,
+          `${i + 1}. ${entry.score} — ${entry.date}`,
           30,
           180 + i * 35
         );
